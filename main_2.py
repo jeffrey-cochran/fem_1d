@@ -1,9 +1,16 @@
 from utils.element_def import element
 from utils.constants import POLYNOMIAL
 from assemble import construct_load, construct_stiffness
+from utils.boundary_conditions import set_essential_boundary_conditions
 from numpy import vectorize
 from numpy import linspace
-nelems = 2
+from numpy import savetxt
+from numpy import exp as np_exp
+from numpy.linalg import solve as np_solve
+from math import exp
+import matplotlib.pyplot as plt
+
+nelems = 16
 polynomial_order = POLYNOMIAL.LINEAR
 x = linspace(0, 1, nelems + 1)
 elements = [
@@ -18,8 +25,7 @@ b = lambda x: 1.
 b = vectorize(b)
 c = lambda x: x
 c = vectorize(c)
-# f = lambda x: 0.25 * pi**2 * cos(pi * x / 2.)
-f = lambda x: 3.*x**2 - 5.
+f = lambda x: 3*x**2 - 5.
 f = vectorize(f)
 
 K, K0, KN = construct_stiffness(
@@ -33,6 +39,7 @@ K, K0, KN = construct_stiffness(
     c
 )
 
+savetxt("stiffness_quad.csv", K, delimiter=" & ", fmt="%.2f")
 
 F = construct_load(
     elements,
@@ -42,20 +49,24 @@ F = construct_load(
     gamma,
     K0,
     KN,
-    f
+    f,
+    k
 )
 
+savetxt("load_quad.csv", F, delimiter=" \\\\ ", fmt="%.2f")
+
 x = linspace(0, 1, 100)
-# t = lambda x: -(5 * x**2 / 4. - 25 * x / 24.) if (x <= 2/3.) else -0.5*(x**2 - 5 * x / 6. - 1 / 6.)
-# t = lambda x: cos(pi * x / 2.)
 t = lambda x: (1 + x)**2
 t = vectorize(t)
 y = t(x)
 
-print("COND: ", cond(K))
+# print("COND: ", cond(K))
 xx = linspace(0, 1, nelems * polynomial_order + 1)
 uu = np_solve(K, F).flatten()
 u = set_essential_boundary_conditions(alpha, gamma, uu)
 
-plt.plot(x, y, 'k-', xx, u, 'ro')
+plt.cla()
+plt.plot(x, y, 'k-', label='True Sol.')
+plt.plot(xx, u, 'ro', label='Numerical Sol.')
+plt.legend()
 plt.show()

@@ -42,5 +42,5 @@ def set_essential_boundary_conditions(
         u[:-1] = uu
         u[-1] = gamma[1]
 
-    print("u: ", u.shape)
+    # print("u: ", u.shape)
     return u

@@ -95,7 +95,8 @@ def construct_load(
     gamma,
     K0,
     KN,
-    f
+    f,
+    k
 ):
     #
     #
@@ -147,7 +148,7 @@ def construct_load(
     elif neumann_bcs[0]:
         F[0, 0] -= k(0) * gamma[0] / alpha[0]
     else:
-        print("Natural BCs at 0")
+        # print("Natural BCs at 0")
         F[0, 0] -= k(0) * gamma[0] / alpha[0]
 
     if essential_bcs[1]:
@@ -156,7 +157,7 @@ def construct_load(
     elif neumann_bcs[1]:
         F[-1, 0] += k(1) * gamma[1] / alpha[1]
     else:
-        print("Natural BCs at 1")
+        # print("Natural BCs at 1")
         F[-1, 0] += k(1) * gamma[1] / alpha[1]
 
     if REMOVE_FIRST: F = F[1:, :]
@@ -273,7 +274,7 @@ def construct_local_stiffness(
     # print("b_quad: ", b_quad)
     c_quad = c(x_quad_transform)
     psi_quad = [p.psi(p, x_quad) for p in shape_functions]
-    print("PQUAD: ", psi_quad)
+    # print("PQUAD: ", psi_quad)
     dpsi_quad = [p.dpsi(p, x_quad) for p in shape_functions]
 
     for index in ndindex(num_shape_functions, num_shape_functions):
@@ -292,7 +293,7 @@ def construct_local_stiffness(
                 k_quad * dpsi_quad[i] * dpsi_quad[j] * (1 / jac)**2
             )
         )
-        print(k_el)
+        # print(k_el)
 
     return k_el
 
